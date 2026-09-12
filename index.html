@@ -336,38 +336,120 @@ button:active{
     50%{transform:scale(1.18)}  
 }  
   
-/* ================= COUNTDOWN ================= */  
-  
-.countCircle{  
-    width:155px;  
-    height:155px;  
-    margin:auto;  
-    border-radius:50%;  
-    background:rgba(255,245,190,.45);  
-    border:5px solid rgba(240,204,98,.8);  
-    display:flex;  
-    justify-content:center;  
-    align-items:center;  
-    box-shadow:0 0 0 rgba(255,190,80,0);  
-    transition:.3s;  
-}  
-  
-.countCircle.pulse{  
-    animation:countPulse .8s ease;  
-}  
-  
-@keyframes countPulse{  
-    0%{transform:scale(.8);box-shadow:0 0 0 rgba(255,190,80,0)}  
-    50%{transform:scale(1.12);box-shadow:0 0 45px rgba(255,190,80,.55)}  
-    100%{transform:scale(1);box-shadow:0 0 0 rgba(255,190,80,0)}  
-}  
-  
-#num{  
-    font-size:74px;  
-    color:#dfa32b;  
-    font-weight:900;  
-}  
-  
+/* ================= COUNTDOWN ================= */
+
+#count{
+    position:relative;
+    overflow:hidden;
+}
+
+.countCircle{
+    width:155px;
+    height:155px;
+    margin:auto;
+    border-radius:50%;
+    background:
+        radial-gradient(circle at 50% 42%, rgba(255,255,255,.98) 0%, rgba(255,245,190,.84) 23%, rgba(255,220,130,.48) 52%, rgba(255,195,80,.16) 72%, transparent 74%),
+        rgba(255,245,190,.25);
+    border:2px solid rgba(240,204,98,.72);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    isolation:isolate;
+    box-shadow:
+        0 0 0 1px rgba(255,205,95,.16),
+        0 0 28px rgba(255,205,95,.24),
+        inset 0 0 28px rgba(255,255,255,.4);
+    backdrop-filter:blur(7px);
+    -webkit-backdrop-filter:blur(7px);
+}
+
+.countCircle.pulse{
+    animation:countPulse .8s cubic-bezier(.16,.8,.24,1);
+}
+
+@keyframes countPulse{
+    0%{transform:scale(.78);box-shadow:0 0 0 0 rgba(255,190,80,0),0 0 0 rgba(255,190,80,0);filter:brightness(.92)}
+    35%{transform:scale(1.08);box-shadow:0 0 0 8px rgba(255,205,95,.08),0 0 48px rgba(255,190,80,.5);filter:brightness(1.08)}
+    65%{transform:scale(1.015);box-shadow:0 0 0 18px rgba(255,205,95,.035),0 0 70px rgba(255,190,80,.28);filter:brightness(1.03)}
+    100%{transform:scale(1);box-shadow:0 0 0 30px rgba(255,205,95,0),0 0 14px rgba(255,190,80,.14);filter:brightness(1)}
+}
+
+.countCircle::before,.countCircle::after{
+    content:"";
+    position:absolute;
+    inset:-10px;
+    border-radius:50%;
+    border:1px solid rgba(255,210,105,.42);
+    z-index:-1;
+    opacity:0;
+}
+
+.countCircle.pulse::before{animation:countRing 1s cubic-bezier(.16,.8,.24,1)}
+.countCircle.pulse::after{
+    inset:-22px;
+    border-color:rgba(255,238,175,.18);
+    animation:countRing 1s .12s cubic-bezier(.16,.8,.24,1);
+}
+
+@keyframes countRing{
+    0%{transform:scale(.72);opacity:0}
+    15%{opacity:.9}
+    100%{transform:scale(1.18);opacity:0}
+}
+
+#num{
+    font-size:74px;
+    color:#dfa32b;
+    font-weight:900;
+    line-height:1;
+    text-shadow:0 2px 0 rgba(255,255,255,.72),0 0 12px rgba(255,190,55,.52),0 0 30px rgba(255,210,95,.32);
+    transform:translateZ(0);
+}
+
+.countCircle.pulse #num{animation:countNumber .8s cubic-bezier(.16,1,.3,1)}
+
+@keyframes countNumber{
+    0%{transform:scale(.45);opacity:0;filter:blur(7px)}
+    45%{transform:scale(1.16);opacity:1;filter:blur(0)}
+    72%{transform:scale(.97)}
+    100%{transform:scale(1);opacity:1}
+}
+
+.countSparkles{position:absolute;inset:0;pointer-events:none}
+.countSparkles::before,.countSparkles::after{
+    content:"✦   ·   ✧   ·   ✦";
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(255,239,177,.95);
+    font-size:15px;letter-spacing:19px;
+    text-shadow:0 0 10px rgba(255,230,150,.9);
+    opacity:0;
+}
+.countCircle.pulse .countSparkles::before{animation:sparkleFloat .8s ease-out}
+.countCircle.pulse .countSparkles::after{transform:rotate(90deg) scale(.8);animation:sparkleFloat .8s .05s ease-out}
+
+@keyframes sparkleFloat{
+    0%{opacity:0;transform:scale(.45) rotate(0deg)}
+    30%{opacity:1}
+    100%{opacity:0;transform:scale(1.35) rotate(18deg)}
+}
+
+/* Countdown cinematic particle + heart finale */
+.countParticles{position:absolute;inset:0;pointer-events:none;z-index:1}
+.countParticle{position:absolute;width:3px;height:3px;border-radius:50%;background:rgba(255,224,139,.9);box-shadow:0 0 8px rgba(255,214,105,.8);animation:particleFloat var(--dur) ease-in-out infinite;animation-delay:var(--delay);opacity:.15}
+@keyframes particleFloat{0%,100%{transform:translate3d(0,16px,0) scale(.55);opacity:.12}45%{opacity:.9}70%{transform:translate3d(var(--dx),-28px,0) scale(1.2);opacity:.65}}
+.countHeartBurst{position:absolute;inset:0;pointer-events:none;z-index:10;display:flex;align-items:center;justify-content:center;opacity:0}
+.countHeartBurst.active{animation:heartFlash 1s ease-out forwards}
+.countHeartCore{font-size:72px;filter:drop-shadow(0 0 12px rgba(255,92,150,.85)) drop-shadow(0 0 34px rgba(255,195,70,.6))}
+.countHeartBurst.active .countHeartCore{animation:heartPop .95s cubic-bezier(.16,1,.3,1) forwards}
+@keyframes heartPop{0%{transform:scale(.15);opacity:0;filter:blur(9px)}35%{transform:scale(1.25);opacity:1;filter:blur(0) drop-shadow(0 0 18px rgba(255,100,160,.9))}55%{transform:scale(.96)}100%{transform:scale(1.12);opacity:0}}
+@keyframes heartFlash{0%{opacity:0;background:radial-gradient(circle,rgba(255,230,160,0),transparent 35%)}28%{opacity:1;background:radial-gradient(circle,rgba(255,226,145,.20),transparent 34%)}100%{opacity:0;background:radial-gradient(circle,rgba(255,226,145,0),transparent 65%)}}
+.countHeartBurst .heartRay{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffe5a0;box-shadow:0 0 12px #ffd36c;left:50%;top:50%;transform:translate(-50%,-50%)}
+.countHeartBurst.active .heartRay{animation:heartRay .85s ease-out forwards}
+@keyframes heartRay{0%{transform:translate(-50%,-50%) rotate(var(--angle)) translateX(0) scale(1);opacity:1}100%{transform:translate(-50%,-50%) rotate(var(--angle)) translateX(var(--dist)) scale(.15);opacity:0}}
+
 /* ================= ENVELOPE ================= */  
   
 .envelopeScreen{  
@@ -643,10 +725,17 @@ button:active{
     margin-top:3px;  
 }  
   
-.options{  
-    opacity:0;  
-    transform:translateY(20px);  
-    transition:.8s;  
+.options{
+    opacity:0;
+    transform:translateY(20px);
+    transition:.8s;
+    max-height:calc(100vh - 300px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding:0 6px 1.5in 0;
+    margin-top:8px;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
 }  
   
 .options.show{  
@@ -673,6 +762,94 @@ button:active{
     box-shadow:0 12px 30px rgba(120,90,0,.15);  
 }  
   
+
+/* ================= MILS PART / NATURAL MAP ================= */
+
+.finalScreen{
+    position:fixed;
+    inset:0;
+    z-index:120;
+    overflow:hidden;
+    padding:0;
+    margin:0;
+    background:#c9dfb1;
+}
+
+.distanceMapViewport{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    margin:0;
+    padding:0;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    background:#c9dfb1;
+}
+
+.distanceMapCanvas{
+    position:relative;
+    width:100%;
+    min-height:30in;
+    height:30in;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:#c9dfb1;
+}
+
+.distanceMapSvg{
+    display:block;
+    width:100%;
+    height:30in;
+    min-height:30in;
+    margin:0;
+    padding:0;
+}
+
+.distanceInfoBox{
+      position:absolute;
+      left:14px;
+      top:14px;
+      z-index:12;
+      width:220px;
+      box-sizing:border-box;
+      padding:12px 14px;
+      border:2px solid rgba(80,55,35,.28);
+      border-radius:6px;
+      background:rgba(255,252,239,.94);
+      color:#4b392c;
+      font-size:14px;
+      line-height:1.7;
+      font-weight:800;
+      box-shadow:0 5px 14px rgba(70,50,30,.18);
+      backdrop-filter:blur(2px);
+  }
+  .distanceInfoBox div{white-space:nowrap;}
+  .distanceInfoBox .heartDistance{color:#c85b76;}
+
+.mapBackButton{
+    position:absolute;
+    left:50%;
+    top:28.7in;
+    transform:translateX(-50%);
+    z-index:10;
+    padding:11px 25px;
+    border-radius:50px;
+    background:linear-gradient(135deg,#ff78a2,#e5ad35);
+    color:#fff;
+    font-size:14px;
+    font-weight:900;
+    box-shadow:0 8px 22px rgba(120,70,40,.25);
+    white-space:nowrap;
+}
+
+@media(max-width:520px){
+    .mapBackButton{font-size:12px;padding:9px 20px}
+}
+
 /* ================= MESSAGE ================= */  
   
 .messageScreen{  
@@ -925,8 +1102,7 @@ button:active{
   
 .secretScreen,  
 .giftScreen,  
-.reasonScreen,  
-.finalScreen{  
+.reasonScreen{  
     position:fixed;  
     inset:0;  
     z-index:120;  
@@ -1061,6 +1237,101 @@ button:active{
 }  
   
   
+
+/* ================= SEE MY HEART ================= */
+.heartScreen{position:fixed;inset:0;z-index:126;overflow:auto;padding:18px 14px;background:rgba(255,244,249,.48);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);animation:heartScreenIn .7s ease}
+.heartWrap{max-width:650px;margin:8px auto 30px;padding:27px 16px 24px;text-align:center;border-radius:32px;background:rgba(255,255,255,.23);border:1px solid rgba(255,255,255,.55);box-shadow:0 25px 75px rgba(150,60,100,.16)}
+.heartTitle{color:#d94f83;font-size:29px;font-weight:900;margin-bottom:7px;text-shadow:0 0 18px rgba(255,96,155,.20);animation:heartTitleFloat 2.8s ease-in-out infinite}
+.heartSubtitle{color:#9d6a7d;font-size:13px;font-weight:700;margin-bottom:18px}
+.heartLockBox{max-width:430px;margin:auto;padding:23px 18px 20px;border-radius:23px;background:linear-gradient(145deg,#12080d,#28121b);border:1px solid rgba(255,111,166,.38);box-shadow:0 18px 48px rgba(80,20,45,.24),inset 0 1px 0 rgba(255,255,255,.08)}
+.heartLockIcon{font-size:52px;filter:drop-shadow(0 0 15px rgba(255,85,145,.55));animation:heartLockBeat 1.5s ease-in-out infinite}
+.heartLockHint{color:#d7aabb;font-size:12px;margin:4px 0 15px}
+.heartPasswordWrap{display:flex;gap:8px}
+#heartPassword{width:100%;min-width:0;padding:13px 14px;border-radius:13px;border:1px solid #573044;outline:none;background:#0d080b;color:#fff;text-align:center;font-size:15px;letter-spacing:2px;transition:.25s}
+#heartPassword:focus{border-color:#ff78aa;box-shadow:0 0 20px rgba(255,100,160,.2)}
+#unlockHeart{padding:0 17px;border-radius:13px;background:linear-gradient(135deg,#ff5f9a,#e95a9d);color:#fff;font-weight:900;white-space:nowrap;transition:.25s;box-shadow:0 7px 18px rgba(230,70,130,.22)}
+#unlockHeart:hover{transform:translateY(-2px) scale(1.02)}
+.heartError{margin-top:12px;min-height:18px;color:#ff88ae;font-size:12px;font-weight:800;opacity:0;transition:.25s}.heartError.show{opacity:1;animation:heartErrorShake .35s ease}
+.heartReveal{display:none;position:relative;margin:20px auto 0;max-width:570px;padding:20px 12px 15px;border-radius:28px;background:linear-gradient(145deg,rgba(255,151,190,.34),rgba(255,195,216,.19));border:1px solid rgba(255,105,160,.48);box-shadow:0 20px 55px rgba(200,60,115,.17),inset 0 1px 0 rgba(255,255,255,.6);overflow:hidden}
+.heartReveal.show{display:block;animation:heartRevealIn .95s cubic-bezier(.2,.8,.2,1) both}
+.heartReveal:before{content:"";position:absolute;inset:-30%;background:radial-gradient(circle at 70% 25%,rgba(255,255,255,.55),transparent 22%),radial-gradient(circle at 30% 75%,rgba(255,80,145,.16),transparent 28%);animation:heartRevealGlow 5s ease-in-out infinite alternate;pointer-events:none}
+.heartSvgBox{position:relative;width:min(100%,520px);margin:auto;filter:drop-shadow(0 12px 22px rgba(205,55,110,.17))}
+.heartSvg{width:100%;height:auto;display:block;overflow:visible}
+.heartOutline{fill:rgba(255,105,160,.035);stroke:#ff5d98;stroke-width:1.15;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 7px rgba(255,70,145,.55));animation:heartOutlinePulse 1.8s ease-in-out infinite}
+.heartInnerGlow{fill:none;stroke:rgba(255,214,228,.85);stroke-width:1.1;vector-effect:non-scaling-stroke;stroke-dasharray:5 8;animation:heartDash 7s linear infinite}
+.heartFillArea{fill:rgba(255,120,165,.045)}
+.heartWordCloud{transform-origin:310px 270px;animation:heartWordsFloat 5s ease-in-out infinite alternate}
+.heartName{fill:#8f244f;font-family:Arial,sans-serif;font-weight:900;font-size:14px;letter-spacing:.4px}
+.heartNameSmall{fill:#a33a64;font-family:Arial,sans-serif;font-weight:800;font-size:10px;letter-spacing:.25px}
+.heartEmptyText{fill:rgba(255,255,255,.7);font-family:Arial,sans-serif;font-weight:700;font-size:11px;letter-spacing:1px}
+.heartCaption{position:relative;color:#b83e70;font-size:12px;font-weight:900;letter-spacing:.5px;margin-top:-2px}
+.heartBack{padding:12px 27px;margin-top:18px;border-radius:50px;background:linear-gradient(135deg,#ff5f9a,#e65a96);color:#fff;box-shadow:0 8px 24px rgba(220,75,130,.2);transition:.3s}.heartBack:hover{transform:translateY(-3px) scale(1.03)}
+.heartScreen.shake{animation:heartScreenShake .35s ease}
+@keyframes heartScreenIn{from{opacity:0}to{opacity:1}}
+@keyframes heartRevealIn{from{opacity:0;transform:translateY(28px) scale(.93)}60%{transform:translateY(-3px) scale(1.01)}to{opacity:1;transform:none}}
+@keyframes heartRevealGlow{from{transform:translate(-3%,-2%) scale(.95)}to{transform:translate(5%,4%) scale(1.08)}}
+@keyframes heartWordsFloat{to{transform:translateY(-3px)}}
+@keyframes heartOutlinePulse{50%{stroke-width:1.7;filter:drop-shadow(0 0 15px rgba(255,70,145,.75))}}
+@keyframes heartDash{to{stroke-dashoffset:-80}}
+@keyframes heartTitleFloat{50%{transform:translateY(-3px)}}
+@keyframes heartLockBeat{50%{transform:scale(1.12)}}
+@keyframes heartErrorShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
+@keyframes heartScreenShake{0%,100%{transform:none}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.heartPasswordWrap button,#unlockHeart{min-width:150px;min-height:52px;padding:0 25px;font-size:15px;font-weight:900;border-radius:16px;box-shadow:0 10px 25px rgba(220,70,120,.28)}
+@media(max-width:520px){.heartWrap{padding:23px 11px 20px}.heartTitle{font-size:25px}.heartPasswordWrap{flex-direction:column}.heartPasswordWrap button{padding:12px}.heartName{font-size:10px}.heartNameSmall{font-size:8.5px}}
+
+/* ================= HEART WORD-ART (REFERENCE STYLE) ================= */
+.heartReveal{display:none;position:relative;margin:20px auto 0;max-width:600px;padding:16px 10px 18px;border-radius:28px;background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(255,238,246,.94));border:1px solid rgba(255,130,170,.25);box-shadow:0 22px 60px rgba(170,55,105,.16);overflow:hidden}
+.heartReveal.show{display:block;animation:heartRevealIn .9s cubic-bezier(.2,.8,.2,1) both}
+.heartReveal:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(255,130,180,.10),transparent 28%),radial-gradient(circle at 30% 85%,rgba(255,210,225,.35),transparent 34%);pointer-events:none}
+.heartArtTitle{position:relative;z-index:2;font-size:11px;font-weight:900;letter-spacing:4px;color:#9a9a9a;margin:2px 0 3px;text-transform:uppercase}
+.heartWordArt{position:relative;width:min(100%,590px);margin:auto;line-height:0;padding:0 2px}
+#heartWordSvg{display:block;width:100%;height:auto;overflow:visible}
+#heartWordCloud text{font-family:Arial,Helvetica,sans-serif;font-weight:900;dominant-baseline:middle;paint-order:stroke;stroke:rgba(255,255,255,.28);stroke-width:.28px;letter-spacing:.15px}
+#heartWordCloud .hw-big{font-weight:950}
+#heartWordCloud .hw-mid{font-weight:900}
+#heartWordCloud .hw-small{font-weight:800}
+.heartCaption{position:relative;z-index:2;color:#999;font-size:11px;font-weight:700;letter-spacing:.2px;margin-top:-2px}
+@media(max-width:520px){.heartReveal{padding:13px 5px 15px}.heartArtTitle{font-size:9px;letter-spacing:3px}.heartCaption{font-size:10px}}
+
+/* ================= FOR YOU, HER BEST FRIEND ================= */
+.bestFriendScreen{position:fixed;inset:0;z-index:125;overflow:auto;padding:18px 14px;background:rgba(255,247,215,.40);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);animation:bestFriendScreenIn .7s ease}
+.bestFriendWrap{max-width:620px;margin:10px auto 30px;padding:28px 18px 24px;text-align:center;border-radius:30px;background:rgba(255,255,255,.20);border:1px solid rgba(255,255,255,.50);box-shadow:0 25px 70px rgba(120,90,0,.15);animation:bestFriendBoxIn .8s cubic-bezier(.2,.8,.2,1)}
+.bestFriendTitle{color:#dfa32b;font-size:29px;font-weight:900;margin-bottom:7px;animation:bestFriendTitleFloat 2.6s ease-in-out infinite}
+.bestFriendSubtitle{color:#d98ca6;font-size:14px;font-weight:700;margin-bottom:18px}
+.bestFriendLetter{position:relative;text-align:left;padding:25px 20px 22px;border-radius:25px;background:rgba(255,190,210,.22);border:1px solid rgba(255,150,185,.35);box-shadow:0 14px 38px rgba(214,112,145,.12),inset 0 1px 0 rgba(255,255,255,.55);overflow:hidden;animation:bestFriendLetterIn 1s .15s both}
+.bestFriendLetter:before{content:"";position:absolute;inset:-40%;background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.48),transparent 24%),radial-gradient(circle at 85% 80%,rgba(255,120,165,.13),transparent 30%);animation:bestFriendGlow 5s ease-in-out infinite alternate;pointer-events:none}
+.bestFriendLetter:after{content:"♥  ✦  ♡  ✦  ♥";position:absolute;top:8px;right:14px;color:rgba(224,101,143,.35);font-size:15px;letter-spacing:4px;animation:bestFriendSpark 2s ease-in-out infinite}
+.bestFriendLetterText{position:relative;z-index:2;color:#5f5558;font-size:16px;line-height:1.95;font-weight:600}
+.bestFriendLetterText p{margin:0 0 17px}.bestFriendLetterText p:last-child{margin-bottom:0}
+.bestFriendHeart{display:block;text-align:center;font-size:34px;margin:2px 0 12px;animation:bestFriendHeartBeat 1.5s ease-in-out infinite}
+.bestFriendBack{padding:12px 27px;margin-top:20px;border-radius:50px;background:linear-gradient(135deg,#ff78a2,#e5ad35);color:white;box-shadow:0 8px 22px rgba(220,100,120,.18);transition:.3s}
+.bestFriendBack:hover{transform:translateY(-3px) scale(1.03)}
+@keyframes bestFriendScreenIn{from{opacity:0}to{opacity:1}}
+@keyframes bestFriendBoxIn{from{opacity:0;transform:translateY(35px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes bestFriendLetterIn{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes bestFriendTitleFloat{50%{transform:translateY(-3px)}}
+@keyframes bestFriendGlow{from{transform:translate(-4%,-2%) scale(.95)}to{transform:translate(5%,4%) scale(1.08)}}
+@keyframes bestFriendSpark{50%{opacity:.75;transform:translateY(2px) scale(1.06)}}
+@keyframes bestFriendHeartBeat{50%{transform:scale(1.18)}}
+@media(max-width:500px){
+
+    #birthday{
+        max-height:92vh;
+        overflow:hidden;
+    }
+
+    #options{
+        max-height:calc(92vh - 245px);
+        overflow-y:auto;
+        overflow-x:hidden;
+        padding-bottom:1.5in;
+        -webkit-overflow-scrolling:touch;
+        touch-action:pan-y;
+        overscroll-behavior:contain;
+    }
+.bestFriendWrap{padding:24px 13px 21px;margin-top:6px}.bestFriendTitle{font-size:25px}.bestFriendSubtitle{font-size:13px}.bestFriendLetter{padding:22px 15px 20px}.bestFriendLetterText{font-size:14px;line-height:1.9}}
+
 /* ================= REASONS ================= */  
   
 .reasonCard{  
@@ -1081,49 +1352,6 @@ button:active{
 @keyframes reasonIn{  
     from{opacity:0;transform:translateY(15px) scale(.9)}  
     to{opacity:1;transform:none}  
-}  
-  
-/* ================= FINAL ================= */  
-  
-.finalScreen{  
-    background:rgba(30,10,20,.94);  
-    color:white;  
-    display:flex;  
-    justify-content:center;  
-    align-items:center;  
-}  
-  
-.finalBox{  
-    max-width:600px;  
-    text-align:center;  
-    padding:30px 20px;  
-}  
-  
-.finalHeart{  
-    font-size:95px;  
-    animation:beat 1s infinite;  
-}  
-  
-.finalTitle{  
-    font-size:35px;  
-    color:#ff91ad;  
-    font-weight:900;  
-    margin:20px 0;  
-}  
-  
-.finalText{  
-    font-size:18px;  
-    line-height:2;  
-    color:#eee;  
-}  
-  
-.finalClose{  
-    margin-top:25px;  
-    padding:12px 25px;  
-    border-radius:50px;  
-    background:#050505;  
-    border:1px solid #ff789f;  
-    color:#ff9fba;  
 }  
   
 /* ================= CLICK HEART ================= */  
@@ -1228,6 +1456,12 @@ button:active{
     100%{opacity:0}  
 }  
   
+/* ================= BIRTHDAY OPTIONS SCROLL FIX ================= */
+#birthday{
+    max-height:92vh;
+    overflow:hidden;
+}
+
 /* ================= MOBILE ================= */  
   
 @media(max-width:500px){  
@@ -1425,9 +1659,22 @@ button:active{
   
     <div id="count" class="card hidden">  
   
+        <div class="countParticles" id="countParticles"></div>
         <div id="countCircle" class="countCircle">  
-            <div id="num">3</div>  
-        </div>  
+            <div id="num">3</div>
+            <div class="countSparkles"></div>
+        </div>
+        <div id="countHeartBurst" class="countHeartBurst">
+            <div class="countHeartCore">❤️</div>
+            <span class="heartRay" style="--angle:0deg;--dist:115px"></span>
+            <span class="heartRay" style="--angle:45deg;--dist:100px"></span>
+            <span class="heartRay" style="--angle:90deg;--dist:125px"></span>
+            <span class="heartRay" style="--angle:135deg;--dist:105px"></span>
+            <span class="heartRay" style="--angle:180deg;--dist:120px"></span>
+            <span class="heartRay" style="--angle:225deg;--dist:100px"></span>
+            <span class="heartRay" style="--angle:270deg;--dist:125px"></span>
+            <span class="heartRay" style="--angle:315deg;--dist:105px"></span>
+        </div>
   
     </div>  
   
@@ -1468,12 +1715,20 @@ button:active{
     </button>  
   
     <button id="finalButton" class="option">  
-        ✨ FINAL SURPRISE ✨  
+        Mils  Part  
     </button>  
   
     <button id="giftButton" class="option">  
         🎁 Open Your Gift  
-    </button>  
+    </button>
+    <button id="heartButton" class="option">
+        💗 See My Heart
+    </button>
+
+    <button id="bestFriendButton" class="option">
+        💗 For You, Her Best Friend
+    </button>
+  
   
 </div>  
   
@@ -1617,137 +1872,225 @@ button:active{
   
 <!-- ================= MEMORIES ================= -->  
   
-<div id="memoryScreen" class="memoryScreen hidden">  
-  
-    <div class="memoryExtraBox">  
-  
-        <div class="memoryMainTitle">  
-            📸 Our Little Memories ❤️  
-        </div>  
-  
-        <div class="memoryIntro">  
-            আগে আমি তোমার সাথে এত কথা বলতাম না,  
-            কিন্তু এখন সবচেয়ে বেশি মনে হয় তোমার সাথেই  
-            সবচেয়ে বেশি কথা হয়। আমার life-এ খুব কমই  
-            তোমার সাথে দেখা হয়েছে। তাও কিছু memory আছে  
-            যেগুলো আমার প্রায়ই মনে পড়ে। 🥹❤️  
-        </div>  
-  
-        <div class="memoryCards">  
-  
-            <div class="memoryItem">  
-  
-                <div class="memoryNumber">  
-                    <span>01</span>  
-                    সবচেয়ে Special দেখা 💗  
-                </div>  
-  
-                <div class="memoryText">  
-                    <span class="memoryEmoji">🥹❤️</span>  
-  
-                    যেগুলো মনে পড়ে তার মধ্যে সবচেয়ে special  
-                    হচ্ছে last বারের দেখা। আমার চাচ্চির বিয়েতে  
-                    তুমি না আসলে হয়তো আজও তোমার সাথে কথাই হতো না,  
-                    আর কথা না হলে মনের কথাও বলতে পারতাম না।  
-                    আর এখন বসে এই website-ও বানাতাম না। 🙃❤️  
-                </div>  
-  
-            </div>  
-  
-            <div class="memoryItem">  
-  
-                <div class="memoryNumber">  
-                    <span>02</span>  
-                    ঈদের সেই সুন্দর দিন 🌸  
-                </div>  
-  
-                <div class="memoryText">  
-                    <span class="memoryEmoji">🌙❤️</span>  
-  
-                    আরেকটা সুন্দর memory হলো ঈদের দিন,  
-                    যখন তোমার সাথে দেখা হয়েছিল।  
-                    তখন তুমি বাসায় ছিলে না।  
-                    কিন্তু যখন তুমি বাসায় আসছো, তখন আমি তোমাকে  
-                    দেখে অনেক খুশি হয়েছিলাম।  
-                    পরে তোমার ওই সময়ের কিছু কাজের জন্য  
-                    তখন থেকেই তোমার প্রতি আমার আরও টান বেড়ে গেছে।  
-                    আর details না হয় বললাম না। 🙈❤️  
-                </div>  
-  
-            </div>  
-  
-            <div class="memoryItem">  
-  
-                <div class="memoryNumber">  
-                    <span>03</span>  
-                    2016-এর সেই সময় 🥹  
-                </div>  
-  
-                <div class="memoryText">  
-                    <span class="memoryEmoji">🌿💗</span>  
-  
-                    আমার যে memories গুলো তোমার সাথে,  
-                    ওগুলোর মধ্যে সবচেয়ে সুন্দর memories হলো  
-                    2016 সালের।  
-                    তখন তুমি অনেক ছোট—খুব সম্ভবত class 2 বা 1-এ পড়ো।  
-                    তখন আমাদের Happy Family program-এর জন্য  
-                    আমরা অনেক সুন্দর সময় spend করেছিলাম।  
-  
-                    <br><br>  
-  
-                    তখন আমি তোমাকে বোনের নজরেই দেখতাম,  
-                    কিন্তু তখন থেকেই মনের অজান্তে তোমার প্রতি  
-                    আমার ভিতরে অন্যরকম একটা টান অনুভব করতাম।  
-                    কিন্তু তখন আমি এত ছোট ছিলাম যে এসব relationship-এর  
-                    কিছুই বুঝতাম না।  
-  
-                    <br><br>  
-  
-                    যাই হোক, তখন তোমার সাথে অনেক সুন্দর time  
-                    spend করেছি। তখন সবাই মিলে অনেক জায়গায় ঘুরেছি।  
-                    বিশেষ করে Zia Park-এ তোমার সাথে অনেকটা পথ  
-                    হাত ধরে হেঁটেছিলাম। ❤️  
-                </div>  
-  
-            </div>  
-  
-            <div class="memoryItem">  
-  
-                <div class="memoryNumber">  
-                    <span>04</span>  
-                    ছোটবেলার ঈদের দিনগুলো 🌙  
-                </div>  
-  
-                <div class="memoryText">  
-                    <span class="memoryEmoji">🏠❤️</span>  
-  
-                    আরও কিছু memory আছে।  
-                    ওগুলো হলো ছোটবেলায় ঈদে মাঝে মাঝে  
-                    তোমাদের বাসায় যেতাম।  
-                    তখন অনেক মজা করতাম।  
-  
-                    <br><br>  
-  
-                    বিশেষ করে ৩ তলায় একসাথে মিলে কাটানো  
-                    সময়গুলো এখনও মাঝে মাঝে স্বপ্নের মাধ্যমে  
-                    visible হয়।  
-                    ছোট ছোট সেই মুহূর্তগুলো হয়তো তখন  
-                    এতটা বুঝিনি, কিন্তু এখন মনে পড়লে  
-                    সত্যিই অনেক সুন্দর লাগে। 🥹💗  
-                </div>  
-  
-            </div>  
-  
-        </div>  
-  
-        <button id="backMemory" class="memoryBack">  
-            ← Back to Birthday  
-        </button>  
-  
-    </div>  
-  
-</div>  
-  
+<div id="memoryScreen" class="memoryScreen hidden">
+
+    <div class="memoryExtraBox">
+
+        <div class="memoryMainTitle">
+            📸 Our Little Memories ❤️
+        </div>
+
+        <div class="memoryIntro">
+            আগে আমি তোমার সাথে এত কথা বলতাম না,
+            কিন্তু এখন সবচেয়ে বেশি মনে হয় তোমার সাথেই
+            সবচেয়ে বেশি কথা হয়। আমার life-এ খুব কমই
+            তোমার সাথে দেখা হয়েছে। তাও কিছু memory আছে
+            যেগুলো আমার প্রায়ই মনে পড়ে। 🥹❤️
+        </div>
+
+        <div class="memoryCards">
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>01</span>
+                    সবচেয়ে Special দেখা 💗
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🥹❤️</span>
+                    যেগুলো মনে পড়ে তার মধ্যে সবচেয়ে special
+                    হচ্ছে last বারের দেখা। আমার চাচ্চির বিয়েতে
+                    তুমি না আসলে হয়তো আজও তোমার সাথে কথাই হতো না,
+                    আর কথা না হলে মনের কথাও বলতে পারতাম না।
+                    আর এখন বসে এই website-ও বানাতাম না। 🙃❤️
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>02</span>
+                    ঈদের সেই সুন্দর দিন 🌸
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🌙❤️</span>
+                    আরেকটা সুন্দর memory হলো ঈদের দিন,
+                    যখন তোমার সাথে দেখা হয়েছিল।
+                    তখন তুমি বাসায় ছিলে না।
+                    কিন্তু যখন তুমি বাসায় আসছো, তখন আমি তোমাকে
+                    দেখে অনেক খুশি হয়েছিলাম।
+                    পরে তোমার ওই সময়ের কিছু কাজের জন্য
+                    তখন থেকেই তোমার প্রতি আমার আরও টান বেড়ে গেছে।
+                    আর details না হয় বললাম না। 🙈❤️
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>03</span>
+                    2016-এর সেই সময় 🥹
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🌿💗</span>
+                    আমার যে memories গুলো তোমার সাথে,
+                    ওগুলোর মধ্যে সবচেয়ে সুন্দর memories হলো
+                    2016 সালের। তখন তুমি অনেক ছোট—খুব সম্ভবত class 2 বা 1-এ পড়ো।
+                    তখন আমাদের Happy Family program-এর জন্য
+                    আমরা অনেক সুন্দর সময় spend করেছিলাম।
+                    <br><br>
+                    তখন আমি তোমাকে বোনের নজরেই দেখতাম,
+                    কিন্তু তখন থেকেই মনের অজান্তে তোমার প্রতি
+                    আমার ভিতরে অন্যরকম একটা টান অনুভব করতাম।
+                    কিন্তু তখন আমি এত ছোট ছিলাম যে এসব relationship-এর
+                    কিছুই বুঝতাম না।
+                    <br><br>
+                    যাই হোক, তখন তোমার সাথে অনেক সুন্দর time
+                    spend করেছি। তখন সবাই মিলে অনেক জায়গায় ঘুরেছি।
+                    বিশেষ করে Zia Park-এ তোমার সাথে অনেকটা পথ
+                    হাত ধরে হেঁটেছিলাম। ❤️
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>04</span>
+                    ছোটবেলার ঈদের দিনগুলো 🌙
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🏠❤️</span>
+                    আরও কিছু memory আছে।
+                    ওগুলো হলো ছোটবেলায় ঈদে মাঝে মাঝে
+                    তোমাদের বাসায় যেতাম। তখন অনেক মজা করতাম।
+                    <br><br>
+                    বিশেষ করে ৩ তলায় একসাথে মিলে কাটানো
+                    সময়গুলো এখনও মাঝে মাঝে স্বপ্নের মাধ্যমে
+                    visible হয়। ছোট ছোট সেই মুহূর্তগুলো হয়তো তখন
+                    এতটা বুঝিনি, কিন্তু এখন মনে পড়লে
+                    সত্যিই অনেক সুন্দর লাগে। 🥹💗
+                </div>
+            </div>
+
+        </div>
+
+        <div class="memoryIntro">
+            তোমার সাথে সামনাসামনি হয়তো তেমন কোনো স্মৃতি নেই, কিন্তু আমার আর তোমার অনলাইনে অনেক স্মৃতি আছে।
+        </div>
+
+        <div class="memoryCards">
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>05</span>
+                    প্রথম কনভারসেশন 💌
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🙃🫠</span>
+                    প্রথম হচ্ছে, যেদিন তোমাকে প্রথম মেসেজ দিয়েছিলাম। তোমার একটা স্টোরিতে রিপ্লাই করেছিলাম—“esob story na die study koro ।” এর বিপরীতে তুমি শুধু 🙃🫠 এই দুইটা ইমোজি দিয়েছিলে, কিন্তু কোনো রিপ্লাই দাওনি। এটাই ছিল তোমার আর আমার প্রথম কনভারসেশন।
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>06</span>
+                    সেই রাতের স্মৃতি ❤️
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🙂❤️</span>
+                    এর পরে তোমার একটা স্টোরিতে লাভ রিঅ্যাক্ট দিয়েছিলাম। এরপর তোমার সন্দেহ হলো। তারপর তুমি আমাকে বিভিন্ন vabe চেষ্টা করছিলে আমার ক্রাশের নাম জানার জন্য। আমিও বুঝতে না পেরে নাম বলে দিয়েছিলাম🙂। কিন্তু ওই দিনের কথাটা আমার জীবনের একটা বেস্ট মেমোরি হয়ে থাকবে। সেদিন রাতে তুমি আমাকে “OK BYE” বলে বারবার ভয় দেখাচ্ছিলে। পরে আমিও বলে দিয়েছিলাম। তখন আমার মনে হয়েছিল, আমার হৃদস্পন্দন যেন ৪–৫ গুণ বেড়ে গেছে।
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>07</span>
+                    রেজাল্টের দিনের স্মৃতি 🥹
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🫶🏻❤️</span>
+                    ১০ তারিখ, যেদিন রেজাল্ট দিয়েছিল, সেদিন আমার মানসিক অবস্থা অনেক খারাপ ছিল। কিন্তু তখন শুধু তুমিই ছিলে, যে আমাকে মানসিকভাবে সাপোর্ট দিয়েছিলে। আর রেজাল্টের পর থেকেই তোমার সাথে আবার কথা শুরু হয়।
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>08</span>
+                    সেই Birthday Wish 🎂
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🥹🎂</span>
+                    এর ৩ দিন পরে, ১৩ তারিখ রাতে আম্মু ফোন নিয়ে নিয়েছিল। কিন্তু সকালে উঠে যখন ইনবক্স চেক করি, আমি পুরো অবাক হয়ে যাই। তুমি আমাকে বার্থডে উইশ করেছিলে। আমি খুব অবাক হয়েছিলাম, কারণ আমি তোমাকে মাত্র একবার আমার বার্থডের তারিখ বলেছিলাম, সেটাও ভয়েসে, অনেক দিন আগে। এতদিন পরেও তুমি সেটা মনে রেখেছিলে—এ কারণেই আমি একটু অবাক হয়েছিলাম।
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>09</span>
+                    প্রথমবার কলে কথা 📞❤️
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🥹📞</span>
+                    তার ২–৩ দিন পর রাতে প্রথমবার আমরা কলে কথা বলেছিলাম। তখনকার অনুভূতিটাও আমি আজীবন মনে রাখব। অনেকবার ভেবেছিলাম, কলে কথা বলা আমার পক্ষে সম্ভব কি না। পরে ভাবলাম, আমি বলি বা না বলি, অন্তত তোমার কিউট ভয়েসটা তো শুনতে পারব। তাই কল দিয়েছিলাম। এরপর আমাদের আরও ৩–৪ বার কলে কথা হয়েছিল।
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>10</span>
+                    Unexpected সেই মেসেজ 💗
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🥹💗</span>
+                    আমার সেরা স্মৃতি বা অনুভূতিগুলোর মধ্যে একটা হলো ওই দিনটা, যেদিন তোমার কাছ থেকে এমন একটা মেসেজ পেয়েছিলাম, যেটা একদমই unexpected ছিল। যেদিন তুমি আমাকে তোমার মনের কথা বলসিলা আমি পুরো অবাক হয়ে গিয়েছিলাম। কিছুক্ষণের জন্য মনে হয়েছিল, যেন সময় থেমে গেছে।
+                </div>
+            </div>
+
+            <div class="memoryItem">
+                <div class="memoryNumber">
+                    <span>11</span>
+                    একটা কষ্টের স্মৃতি 🖤
+                </div>
+                <div class="memoryText">
+                    <span class="memoryEmoji">🥀</span>
+                    এটা তুমি চাইলে এখন স্কিপ করতে পারো। আগে ওয়েবসাইটের বাকি জায়গাগুলো ঘুরে দেখো, পরে এটা পড়ো। এখানে আমি আমার কিছু কষ্টের স্মৃতি দিচ্ছি।
+                    <br><br>
+                    সবকিছুই সুন্দর যাচ্ছিল। কিন্তু সেদিন কথার মাঝখানে আমি তোমাকে জিজ্ঞেস করেছিলাম, “যদি ভবিষ্যতে অন্য কেউ আসতে চায়, তুমি কি তাকে আসতে দেবে?”
+                    <br><br>
+                    তুমি খুব স্বাভাবিকভাবেই বলেছিলে, “ভবিষ্যৎ সম্পর্কে তো আর জানি না।”
+                    <br><br>
+                    কিন্তু তোমার এই স্বাভাবিক কথাটাই আমি এত বেশি ওভারথিংকিং করেছিলাম যে, টানা ২ দিন পুরো রাত ঘুমাতে পারিনি।
+                    <br><br>
+                    এরপর তোমাকে আরও অনেক কিছু লিখেছিলাম। কিন্তু তুমি কষ্ট পাবে ভেবে অনেক কিছু ডিলিট করে দিয়েছিলাম। কিছু মেসেজ রেখেছিলাম, কিন্তু পরে সেগুলো সিন করার পরও ডিলিট করে দিয়েছিলাম।
+                    <br><br>
+                    কিন্তু আমার কষ্ট লেগেছিল একটা বিষয়েই—তোমার যেন আমার কথাগুলো শুনে মন খারাপ না হয়, সেই জন্যই আমি মেসেজগুলো ডিলিট করেছিলাম। কিন্তু তুমি আমাকে ভুল বুঝেছিলে। আমি তোমাকে এতটুকুও বিশ্বাস করি না যে মেসেজগুলো ডিলিট করে দেব—বিষয়টা এমন ছিল না।
+                    <br><br>
+                    সত্যি কথা বলতে, অন্য কোনো সময় হলে আমি মেসেজগুলো ডিলিট করতাম না। কিন্তু এখন তুমি অনেক ব্যস্ত থাকো। এই ব্যস্ততার মধ্যে আমি কেন তোমাকে অযথা বাড়তি কষ্ট দেব?
+                    <br><br>
+                    যদিও তুমি বলেছিলে যে এসব নিয়ে তুমি চিন্তা করো না, কিন্তু আমি তোমাকে চিনি। তুমি একটু হলেও চিন্তা করতে। আর এই কারণেই আমি মেসেজগুলো ডিলিট করেছিলাম।
+                    <br><br>
+                    কিন্তু তুমি আমাকে বলোনি যে বিষয়টা তোমার খারাপ লেগেছে। প্রথমে আমি বুঝতেও পারিনি। কিন্তু ওই সময় তুমি অনেকগুলো ভয়েস মেসেজ দিয়েছিলে, যেখানে তুমি বলেছিলে—“যে কিনা কিছু বলে আবার ডিলিট করে দেয়…”
+                    <br><br>
+                    ওই ভয়েসটা শোনার পরই আমি সব বুঝে গিয়েছিলাম।
+                    <br><br>
+                    কিন্তু তখন আমার নিজেরই খুব কষ্ট হয়েছিল। মনে হয়েছিল, কেন তুমি আমাকে আবার কষ্ট দিচ্ছ? কেন আবার দূরে সরিয়ে দিচ্ছ?
+                    <br><br>
+                    যাই হোক, পরে আবার তোমাকে ফিরে পেয়েছিলাম।
+                    <br><br>
+                    আমার কিছু প্রশ্ন আছে। ভেবেছিলাম তোমাকে এগুলো এখন ইনবক্সে করব। কিন্তু ৪ তারিখ থেকে আজ ৬ তারিখ পর্যন্ত তুমি অফলাইনে আছো। তাই ভাবলাম, তোমাকে এখানেই প্রশ্নগুলো করি।
+                    <br><br>
+                    .....
+                    <br><br>
+                    পরে আর লিখলাম না ........
+                </div>
+            </div>
+
+        </div>
+
+        <button id="backMemory" class="memoryBack">
+            ← Back to Birthday
+        </button>
+
+    </div>
+
+</div>
+
 <!-- ================= SECRET ================= -->  
   
 <div id="secretScreen" class="secretScreen hidden">
@@ -1861,8 +2204,16 @@ button:active{
            target="_blank"  
            rel="noopener noreferrer">  
             CLICK HERE 🎁  
-        </a>  
-    </div>  
+        </a>
+        <a id="giftDriveButton2"
+           class="giftDriveButton"
+           href="https://drive.google.com/file/d/1fynQCwwqfz3x177lmcWycx8tnmFCr-Vh/view?usp=sharing"
+           target="_blank"
+           rel="noopener noreferrer"
+           style="margin-top:10px;">
+            TAP HERE 🎁
+        </a>
+    </div>
 </div>  
         </div>  
         <br><button id="backGift" class="extraBack">← Back to Birthday</button>  
@@ -1871,6 +2222,60 @@ button:active{
     <div id="giftRedFlash" class="giftRedFlash"></div>  
 </div>  
   
+
+<!-- ================= SEE MY HEART ================= -->
+<div id="heartScreen" class="heartScreen hidden">
+  <div class="heartWrap">
+    <div class="heartTitle">💗 See My Heart</div>
+    <div class="heartSubtitle">Some things are kept a little deeper... 🔐</div>
+
+    <div class="heartLockBox" id="heartLockBox">
+      <div class="heartLockIcon">❤️</div>
+      <div class="heartLockHint">Enter the password to see what's inside my heart.</div>
+      <div class="heartPasswordWrap">
+        <input id="heartPassword" type="password" placeholder="Enter password" autocomplete="off">
+        <button id="unlockHeart">OPEN ❤️</button>
+      </div>
+      <div id="heartError" class="heartError">Wrong password. Try again ❤️</div>
+    </div>
+
+    <div id="heartReveal" class="heartReveal">
+      <div class="heartArtTitle">MY HEART</div>
+      <div class="heartWordArt" aria-label="Heart made from names">
+        <svg id="heartWordSvg" viewBox="0 0 620 560" role="img">
+          <defs>
+            <clipPath id="heartWordClip">
+              <path d="M310 515 C270 477 73 349 52 214 C36 111 108 42 189 52 C245 59 286 92 310 135 C334 92 375 59 431 52 C512 42 584 111 568 214 C547 349 350 477 310 515 Z"/>
+            </clipPath>
+          </defs>
+          <g id="heartWordCloud" clip-path="url(#heartWordClip)"></g>
+        </svg>
+      </div>
+      <div class="heartCaption">Every little word has a place in my heart. ❤️</div>
+    </div>
+
+    <button id="backHeart" class="heartBack">← Back to Birthday</button>
+  </div>
+</div>
+
+<!-- ================= FOR YOU, HER BEST FRIEND ================= -->
+<div id="bestFriendScreen" class="bestFriendScreen hidden">
+  <div class="bestFriendWrap">
+    <div class="bestFriendTitle">💗 For You, Her Best Friend</div>
+    <div class="bestFriendSubtitle">A little message from me, just for you... 🫶</div>
+    <div class="bestFriendLetter">
+      <div class="bestFriendHeart">💗</div>
+      <div class="bestFriendLetterText">
+        <p>আমার যতটুকু মনে হয়, আপনাকে আমার Madam এই website-টা দিয়েছে। আপনি ওর Best Friend, তাই ভাবলাম আপনাকে কিছু বলি। কারণ, ওর জীবনে আপনার একটা ভালোই important জায়গা আছে। যতটুকু শুনেছি, ওর সব কষ্টের সময় আপনি ওর সঙ্গে থাকেন। ও যখন খারাপ থাকে, তখনও ওর পাশে থাকার চেষ্টা করেন। এর জন্য আপনাকে সত্যিই ধন্যবাদ। ❤️</p>
+        <p>আসলে ও আমার কাছে অনেক গুরুত্বপূর্ণ। তাই আমার Madam-কে সবসময় ভালো রাখবেন, হাসিখুশি রাখবেন। 🫶</p>
+        <p>আর একটা কথা—যতটুকু শুনেছি আপনাদের friendship-এর ব্যাপারে, ততটুকু থেকেই বলতেছি, এরকম friendship সত্যিই খুব কম হয়। তাই এই friendship-এর মূল্য সবসময় বুঝবেন এবং এটাকে যত্ন করে ধরে রাখবেন। সবসময় একে অপরের পাশে থাকবেন। ❤️</p>
+        <p>শেষে শুধু এটুকুই বলবো—আমার Madam-এর একজন ভালো Best Friend হয়ে সবসময় ওর পাশে থাকবেন।</p>
+      </div>
+    </div>
+    <button id="backBestFriend" class="bestFriendBack">← Back to Birthday</button>
+  </div>
+</div>
+
 <!-- ================= REASONS ================= -->  
   
 <div id="reasonScreen" class="reasonScreen hidden">  
@@ -1897,41 +2302,180 @@ button:active{
   
 </div>  
   
-<!-- ================= FINAL SURPRISE ================= -->  
-  
-<div id="finalScreen" class="finalScreen hidden">  
-  
-    <div class="finalBox">  
-  
-        <div class="finalHeart">  
-            ❤️  
-        </div>  
-  
-        <div class="finalTitle">  
-            One Last Thing... 🥹  
-        </div>  
-  
-        <div class="finalText">  
-            No matter how many pages I make for you,<br>  
-            no matter how many words I write,<br>  
-            তোমাকে আমার কাছে কতটা special  
-            সেটা হয়তো কখনো পুরোপুরি বোঝাতে পারব না। ❤️<br><br>  
-  
-            শুধু এটুকু মনে রেখো—<br>  
-  
-            <strong>  
-                তুমি আমার কাছে সত্যিই অনেক special। 💗  
-            </strong>  
-        </div>  
-  
-        <button id="closeFinal" class="finalClose">  
-            ❤️ Back  
-        </button>  
-  
-    </div>  
-  
-</div>  
-  
+
+<!-- ================= MILS PART / DISTANCE MAP ================= -->
+
+<div id="finalScreen" class="finalScreen hidden">
+    <div class="distanceMapViewport">
+      <div class="distanceInfoBox" aria-label="Distance information">
+          <div>সোজাসুজি দূরত্ব: প্রায় 47 কিমি</div>
+          <div>সড়কপথে: প্রায় 59 কিমি</div>
+          <div class="heartDistance">মনের দূরত্ব : 0 কিমি</div>
+      </div>
+              <div class="distanceMapCanvas">
+            <svg class="distanceMapSvg" viewBox="0 0 1400 2400" preserveAspectRatio="none" aria-label="Detailed natural map">
+                <defs>
+                    <linearGradient id="landGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#dfe9c8"/>
+                        <stop offset=".48" stop-color="#c9dfb1"/>
+                        <stop offset="1" stop-color="#b9d39c"/>
+                    </linearGradient>
+                    <linearGradient id="riverGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0" stop-color="#8fc8d2"/>
+                        <stop offset=".5" stop-color="#5daebd"/>
+                        <stop offset="1" stop-color="#86c6cf"/>
+                    </linearGradient>
+                    <pattern id="fieldPattern" width="80" height="80" patternUnits="userSpaceOnUse">
+                        <rect width="80" height="80" fill="#d5e6b9"/>
+                        <path d="M0 20H80M0 60H80M20 0V80M60 0V80" stroke="#b6d092" stroke-width="2" opacity=".42"/>
+                        <path d="M0 0L80 80M80 0L0 80" stroke="#e7efcf" stroke-width="1" opacity=".55"/>
+                    </pattern>
+                    <pattern id="roadDots" width="18" height="18" patternUnits="userSpaceOnUse">
+                        <circle cx="3" cy="4" r="1.3" fill="#8fae79" opacity=".45"/>
+                        <circle cx="13" cy="12" r="1" fill="#78996a" opacity=".35"/>
+                    </pattern>
+                    <filter id="softShadow">
+                        <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity=".22"/>
+                    </filter>
+                </defs>
+
+                <!-- full map land: no blank top/bottom -->
+                <rect width="1400" height="2400" fill="url(#landGrad)"/>
+                <rect x="20" y="20" width="1360" height="2360" rx="30" fill="url(#fieldPattern)" opacity=".54"/>
+                <rect width="1400" height="2400" fill="url(#roadDots)" opacity=".28"/>
+
+                <!-- natural field blocks -->
+                <g fill="none" stroke="#9fbd82" stroke-width="5" opacity=".62">
+                    <path d="M0 250 C180 220 250 300 410 255 S720 180 890 255 S1160 330 1400 245"/>
+                    <path d="M0 510 C150 465 310 555 480 510 S790 455 960 520 S1210 570 1400 500"/>
+                    <path d="M0 800 C190 745 300 840 510 785 S820 730 1020 810 S1240 850 1400 780"/>
+                    <path d="M0 1120 C170 1060 330 1155 500 1100 S800 1050 1000 1130 S1230 1170 1400 1090"/>
+                    <path d="M0 1500 C180 1450 330 1540 510 1485 S820 1430 1010 1515 S1230 1550 1400 1480"/>
+                    <path d="M0 1880 C170 1820 340 1920 520 1860 S820 1810 1020 1890 S1230 1940 1400 1850"/>
+                    <path d="M0 2180 C180 2130 350 2220 540 2160 S820 2110 1010 2190 S1230 2230 1400 2150"/>
+                </g>
+
+                <!-- district/area boundaries -->
+                <g fill="none" stroke="#b47f77" stroke-width="2.5" stroke-dasharray="12 10" opacity=".55">
+                    <path d="M210 0 C290 230 180 420 285 650 S350 980 245 1220 S320 1570 225 1810 S300 2200 250 2400"/>
+                    <path d="M1030 0 C940 260 1080 430 980 670 S920 1010 1035 1260 S955 1580 1060 1840 S980 2180 1060 2400"/>
+                </g>
+
+                <!-- main river -->
+                <path d="M690 -40 C580 170 760 310 635 500 C500 705 730 830 610 1025 C500 1210 750 1370 610 1575 C485 1760 720 1910 610 2100 C540 2215 650 2330 585 2440 L875 2440 C930 2260 760 2140 855 1970 C960 1775 760 1600 875 1410 C990 1215 760 1040 900 845 C1025 665 800 475 915 290 C1000 155 850 50 920 -40 Z"
+                      fill="url(#riverGrad)" stroke="#438e9b" stroke-width="8" opacity=".97"/>
+                <path d="M760 -20 C675 220 820 330 700 520 S800 830 680 1040 S825 1330 700 1540 S815 1880 690 2110 S740 2290 675 2420"
+                      fill="none" stroke="#d5f2f0" stroke-width="18" opacity=".5"/>
+
+                <!-- tributaries -->
+                <g fill="none" stroke="#70b9c2" stroke-width="13" opacity=".9">
+                    <path d="M0 420 C220 390 370 460 610 520"/>
+                    <path d="M1400 650 C1180 610 1060 720 890 820"/>
+                    <path d="M0 1310 C240 1270 400 1380 610 1510"/>
+                    <path d="M1400 1750 C1190 1700 1050 1800 820 1910"/>
+                </g>
+
+                <!-- ponds -->
+                <g fill="#78bfc8" stroke="#4f9ea9" stroke-width="5">
+                    <ellipse cx="190" cy="680" rx="85" ry="48"/>
+                    <ellipse cx="1130" cy="360" rx="100" ry="54"/>
+                    <ellipse cx="220" cy="1580" rx="92" ry="50"/>
+                    <ellipse cx="1170" cy="1320" rx="105" ry="58"/>
+                    <ellipse cx="1110" cy="2190" rx="82" ry="46"/>
+                </g>
+
+                <!-- major highway -->
+                <path d="M-40 360 C250 430 350 330 530 450 S860 590 1030 500 S1210 350 1440 430"
+                      fill="none" stroke="#6c6c66" stroke-width="68" stroke-linecap="round"/>
+                <path d="M-40 360 C250 430 350 330 530 450 S860 590 1030 500 S1210 350 1440 430"
+                      fill="none" stroke="#e8dfbc" stroke-width="50" stroke-linecap="round"/>
+                <path d="M-40 360 C250 430 350 330 530 450 S860 590 1030 500 S1210 350 1440 430"
+                      fill="none" stroke="#fff7ce" stroke-width="4" stroke-dasharray="28 24" stroke-linecap="round"/>
+
+                <!-- long secondary roads -->
+                <g fill="none" stroke-linecap="round">
+                    <path d="M80 0 C140 300 210 520 170 780 S260 1130 175 1390 S250 1740 165 2050 S210 2290 170 2400" stroke="#8c8a7d" stroke-width="32"/>
+                    <path d="M1240 0 C1190 280 1270 540 1190 800 S1250 1110 1180 1370 S1280 1700 1200 1980 S1250 2250 1210 2400" stroke="#8c8a7d" stroke-width="32"/>
+                    <path d="M0 980 C250 930 410 1000 600 930 S930 900 1150 990 S1320 1030 1400 1000" stroke="#918f82" stroke-width="28"/>
+                    <path d="M0 1760 C220 1690 390 1790 590 1710 S930 1660 1120 1760 S1310 1810 1400 1760" stroke="#918f82" stroke-width="28"/>
+                </g>
+                <g fill="none" stroke="#eee7c8" stroke-width="3" stroke-dasharray="18 18">
+                    <path d="M80 0 C140 300 210 520 170 780 S260 1130 175 1390 S250 1740 165 2050 S210 2290 170 2400"/>
+                    <path d="M1240 0 C1190 280 1270 540 1190 800 S1250 1110 1180 1370 S1280 1700 1200 1980 S1250 2250 1210 2400"/>
+                </g>
+
+                <!-- bridges -->
+                <g filter="url(#softShadow)">
+                    <rect x="545" y="545" width="315" height="48" rx="12" fill="#5b5750"/>
+                    <rect x="550" y="551" width="305" height="7" fill="#f5e9bd"/>
+                    <rect x="545" y="1435" width="325" height="48" rx="12" fill="#5b5750"/>
+                    <rect x="550" y="1441" width="315" height="7" fill="#f5e9bd"/>
+                </g>
+
+                <!-- forests / jungle -->
+                <g fill="#6f9b57" stroke="#4e7b42" stroke-width="2">
+                    <circle cx="270" cy="200" r="25"/><circle cx="320" cy="185" r="31"/><circle cx="360" cy="215" r="26"/>
+                    <circle cx="1130" cy="790" r="31"/><circle cx="1180" cy="770" r="26"/><circle cx="1220" cy="810" r="34"/>
+                    <circle cx="300" cy="1120" r="30"/><circle cx="350" cy="1090" r="26"/><circle cx="395" cy="1130" r="34"/>
+                    <circle cx="1060" cy="1550" r="28"/><circle cx="1110" cy="1520" r="35"/><circle cx="1160" cy="1560" r="27"/>
+                    <circle cx="310" cy="1990" r="34"/><circle cx="360" cy="1960" r="27"/><circle cx="405" cy="2010" r="31"/>
+                    <circle cx="1040" cy="2250" r="30"/><circle cx="1090" cy="2220" r="35"/><circle cx="1140" cy="2260" r="28"/>
+                </g>
+
+                <!-- tiny settlement clusters -->
+                <g fill="#a96f58" stroke="#754d40" stroke-width="2">
+                    <g transform="translate(470 700)"><path d="M0 14L18 0L36 14V34H0Z"/><path d="M48 18L64 5L80 18V35H48Z"/><path d="M92 14L109 1L126 14V34H92Z"/></g>
+                    <g transform="translate(850 1120)"><path d="M0 14L18 0L36 14V34H0Z"/><path d="M48 18L64 5L80 18V35H48Z"/><path d="M92 14L109 1L126 14V34H92Z"/></g>
+                    <g transform="translate(440 1810)"><path d="M0 14L18 0L36 14V34H0Z"/><path d="M48 18L64 5L80 18V35H48Z"/><path d="M92 14L109 1L126 14V34H92Z"/></g>
+                </g>
+
+                <!-- tiny sunflower garden -->
+                <g transform="translate(1040 1040)">
+                    <rect x="0" y="0" width="170" height="105" rx="12" fill="#a6c77b" stroke="#759d5e" stroke-width="4"/>
+                    <g fill="#f2c84b" stroke="#8f7130" stroke-width="1">
+                        <circle cx="25" cy="25" r="8"/><circle cx="55" cy="42" r="8"/><circle cx="88" cy="24" r="8"/>
+                        <circle cx="120" cy="48" r="8"/><circle cx="150" cy="27" r="8"/>
+                        <circle cx="35" cy="78" r="8"/><circle cx="72" cy="66" r="8"/><circle cx="108" cy="84" r="8"/><circle cx="143" cy="70" r="8"/>
+                    </g>
+                    <text x="85" y="125" text-anchor="middle" font-size="18" fill="#557442" font-weight="700">sunflower garden</text>
+                </g>
+
+                <!-- route -->
+                <path id="mapConnection" d="M700 95 C610 310 820 500 650 720 S800 1030 670 1260 S800 1510 690 1740 S760 1870 700 2280"
+                      fill="none" stroke="#c62828" stroke-width="7" stroke-dasharray="18 16" stroke-linecap="round" opacity=".92"/>
+
+                <!-- pins, small -->
+                <g id="mapPin1" transform="translate(700 100)" filter="url(#softShadow)">
+                    <path d="M0 0 C-34 -38 -28 -82 0 -82 C28 -82 34 -38 0 0Z" fill="#e53935" stroke="#8f1f1f" stroke-width="4"/>
+                    <circle cx="0" cy="-55" r="12" fill="#fff"/>
+                    <text x="45" y="-48" font-size="34" fill="#7b2525" font-weight="900">bibaria</text>
+                </g>
+
+                <g id="mapPin2" transform="translate(700 2190)" filter="url(#softShadow)">
+                    <path d="M0 0 C-34 -38 -28 -82 0 -82 C28 -82 34 -38 0 0Z" fill="#e53935" stroke="#8f1f1f" stroke-width="4"/>
+                    <circle cx="0" cy="-55" r="12" fill="#fff"/>
+                    <text x="45" y="-48" font-size="34" fill="#7b2525" font-weight="900">norsingdi</text>
+                </g>
+
+                <!-- small map details -->
+                <g fill="#4d7046" font-size="24" font-weight="700" opacity=".82">
+                    <text x="80" y="300">fields</text>
+                    <text x="1050" y="620">forest</text>
+                    <text x="90" y="1290">wetlands</text>
+                    <text x="1030" y="1690">green belt</text>
+                </g>
+
+                <!-- final compact button area, still inside map -->
+                <g>
+                    <rect x="520" y="2310" width="360" height="62" rx="31" fill="rgba(255,255,255,.88)" stroke="#d78c3c" stroke-width="4"/>
+                </g>
+            </svg>
+
+            <button id="backMap" class="mapBackButton">❤️ back to birthday</button>
+        </div>
+    </div>
+</div>
+
 <script>  
   
 /* =====================================================  
@@ -2302,68 +2846,67 @@ document.getElementById("yes").onclick=function(){
    COUNTDOWN  
 ===================================================== */  
   
-function countdown(){  
-  
-    document.getElementById("count")  
-        .classList.remove("hidden");  
-  
-    let n=3;  
-  
-    document.getElementById("num").textContent=n;  
-  
-    pulseCount();  
-  
-    const timer=setInterval(()=>{  
-  
-        n--;  
-  
-        if(n>0){  
-  
-            document.getElementById("num")  
-                .textContent=n;  
-  
-            pulseCount();  
-  
-        }else{  
-  
-            clearInterval(timer);  
-  
-            document.getElementById("num")  
-                .textContent="❤️";  
-  
-            pulseCount();  
-  
-            setTimeout(()=>{  
-  
-                document.getElementById("count")  
-                    .classList.add("hidden");  
-  
-                document.getElementById("envelopeScreen")  
-                    .classList.remove("hidden");  
-  
-                confetti();  
-  
-            },700);  
-        }  
-  
-    },1000);  
-}  
-  
-function pulseCount(){  
-  
-    const circle=  
-        document.getElementById("countCircle");  
-  
-    circle.classList.remove("pulse");  
-  
-    void circle.offsetWidth;  
-  
-    circle.classList.add("pulse");  
-}  
-  
-  
-/* =====================================================  
-   ENVELOPE  
+function countdown(){
+    const countScreen=document.getElementById("count");
+    const particles=document.getElementById("countParticles");
+    const heartBurst=document.getElementById("countHeartBurst");
+    const num=document.getElementById("num");
+
+    countScreen.classList.remove("hidden");
+    heartBurst.classList.remove("active");
+    heartBurst.style.display="none";
+    particles.innerHTML="";
+
+    for(let i=0;i<28;i++){
+        const p=document.createElement("span");
+        p.className="countParticle";
+        p.style.left=(8+Math.random()*84)+"%";
+        p.style.top=(8+Math.random()*84)+"%";
+        p.style.setProperty("--dx",((Math.random()-.5)*55)+"px");
+        p.style.setProperty("--dur",(2.8+Math.random()*3.8)+"s");
+        p.style.setProperty("--delay",(-Math.random()*4)+"s");
+        p.style.width=p.style.height=(1.5+Math.random()*3)+"px";
+        particles.appendChild(p);
+    }
+
+    let n=3;
+    num.textContent=n;
+    pulseCount();
+
+    const timer=setInterval(()=>{
+        n--;
+        if(n>0){
+            num.textContent=n;
+            pulseCount();
+        }else{
+            clearInterval(timer);
+            num.style.opacity="0";
+            heartBurst.style.display="flex";
+            void heartBurst.offsetWidth;
+            heartBurst.classList.add("active");
+
+            setTimeout(()=>{
+                countScreen.classList.add("hidden");
+                heartBurst.classList.remove("active");
+                heartBurst.style.display="none";
+                num.style.opacity="1";
+                document.getElementById("envelopeScreen").classList.remove("hidden");
+                confetti();
+            },850);
+        }
+    },1000);
+}
+
+function pulseCount(){
+    const circle=document.getElementById("countCircle");
+    circle.classList.remove("pulse");
+    void circle.offsetWidth;
+    circle.classList.add("pulse");
+}
+
+
+/* =====================================================
+   ENVELOPE
 ===================================================== */  
   
 document.getElementById("click").onclick=function(){  
@@ -2605,6 +3148,139 @@ document.getElementById("unlockGift").onclick=unlockGift;
 document.getElementById("giftPassword").addEventListener("keydown",e=>{if(e.key==="Enter")unlockGift()});  
 document.getElementById("backGift").onclick=function(){buttonSound();document.getElementById("giftScreen").classList.add("hidden");document.getElementById("birthday").classList.remove("hidden")};  
   
+
+/* =====================================================
+   SEE MY HEART
+===================================================== */
+const HEART_PASSWORD="iloveyoubividha";
+function buildHeartWordArt(){
+    const svg=document.getElementById("heartWordCloud");
+    if(!svg) return;
+    svg.innerHTML="";
+
+    /* Clean, reference-style typography heart:
+       rows follow the natural heart silhouette instead of random placement. */
+    const names=["Picci","Madam","Doctor","Love","Everything","Hapyness","Wikness","Bividha","Pora"];
+    const colors=["#111111","#1b1b1b","#2a2a2a","#3a3a3a","#d91f3f","#e33a55","#b51c34"];
+
+    // Each row is intentionally composed like a word-art poster.
+    const rows=[
+      {y:72,  x:188, words:[["Picci",12,0],["Madam",15,0],["Bividha",11,0]]},
+      {y:91,  x:157, words:[["Love",25,0],["Doctor",12,0],["Pora",13,0],["Madam",10,0]]},
+      {y:111, x:120, words:[["Everything",14,0],["Picci",17,0],["Hapyness",12,0],["Love",15,0]]},
+      {y:132, x:91,  words:[["Madam",12,-7],["Wikness",11,0],["Doctor",21,0],["Bividha",12,0],["Pora",13,8]]},
+      {y:153, x:77,  words:[["Picci",11,0],["Love",16,0],["Everything",12,0],["Madam",24,0],["Doctor",11,0],["Bividha",11,0]]},
+      {y:175, x:68,  words:[["Pora",12,0],["Hapyness",11,0],["Picci",19,0],["Wikness",12,0],["Love",13,0],["Madam",14,0],["Doctor",10,0]]},
+      {y:198, x:63,  words:[["Bividha",11,0],["Everything",13,0],["Love",28,0],["Picci",12,0],["Pora",11,0],["Madam",13,0]]},
+      {y:222, x:60,  words:[["Doctor",12,0],["Hapyness",13,0],["Wikness",11,0],["Madam",18,0],["Bividha",12,0],["Love",17,0],["Picci",11,0]]},
+      {y:247, x:59,  words:[["Picci",12,0],["Everything",12,0],["Pora",11,0],["Doctor",16,0],["Love",25,0],["Wikness",11,0],["Madam",13,0]]},
+      {y:272, x:63,  words:[["Bividha",11,0],["Madam",14,0],["Hapyness",12,0],["Picci",19,0],["Love",14,0],["Everything",12,0],["Pora",11,0]]},
+      {y:297, x:70,  words:[["Wikness",11,0],["Doctor",13,0],["Love",18,0],["Bividha",12,0],["Madam",23,0],["Picci",11,0]]},
+      {y:321, x:78,  words:[["Pora",12,0],["Everything",13,0],["Hapyness",11,0],["Love",27,0],["Doctor",12,0],["Madam",14,0]]},
+      {y:344, x:91,  words:[["Picci",12,0],["Wikness",11,0],["Bividha",14,0],["Madam",18,0],["Love",14,0],["Pora",12,0]]},
+      {y:366, x:107, words:[["Doctor",12,0],["Everything",12,0],["Picci",17,0],["Hapyness",11,0],["Love",15,0],["Madam",12,0]]},
+      {y:387, x:125, words:[["Bividha",11,0],["Pora",13,0],["Love",23,0],["Wikness",11,0],["Doctor",12,0]]},
+      {y:407, x:146, words:[["Madam",12,0],["Everything",11,0],["Picci",15,0],["Love",14,0],["Hapyness",11,0]]},
+      {y:427, x:174, words:[["Pora",11,0],["Bividha",12,0],["Madam",14,0],["Love",18,0]]},
+      {y:447, x:204, words:[["Picci",12,0],["Doctor",11,0],["Wikness",12,0]]},
+      {y:467, x:232, words:[["Bividha",11,0],["Love",15,0],["Pora",11,0]]},
+      {y:487, x:259, words:[["Madam",12,0],["Picci",11,0]]}
+    ];
+
+    let globalIndex=0;
+    rows.forEach((row,r)=>{
+        let x=row.x;
+        row.words.forEach(([word,size,angle])=>{
+            const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+            const estimated=word.length*size*.58;
+            const gap=4.5;
+            const xx=x+estimated/2;
+            const yy=row.y;
+            t.textContent=word;
+            t.setAttribute("x",xx);
+            t.setAttribute("y",yy);
+            t.setAttribute("font-size",size);
+            t.setAttribute("text-anchor","middle");
+            t.setAttribute("fill",colors[(globalIndex*3+r)%colors.length]);
+            t.setAttribute("transform",`rotate(${angle} ${xx} ${yy})`);
+            t.classList.add(size>=20?"hw-big":size>=14?"hw-mid":"hw-small");
+            svg.appendChild(t);
+            x+=estimated+gap;
+            globalIndex++;
+        });
+    });
+
+    // A few vertical words give the same poster-like edge detail as the reference,
+    // while remaining aligned and intentional rather than random.
+    const vertical=[
+      [77,185,"Love",12,-90],[550,187,"Madam",12,90],
+      [84,252,"Picci",11,-90],[543,250,"Doctor",11,90],
+      [111,310,"Bividha",10,-90],[516,312,"Pora",10,90],
+      [142,353,"Wikness",10,-90],[484,354,"Everything",10,90]
+    ];
+    vertical.forEach(([x,y,word,size,angle],i)=>{
+        const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+        t.textContent=word;
+        t.setAttribute("x",x); t.setAttribute("y",y);
+        t.setAttribute("font-size",size);
+        t.setAttribute("text-anchor","middle");
+        t.setAttribute("fill",colors[(i+2)%colors.length]);
+        t.setAttribute("transform",`rotate(${angle} ${x} ${y})`);
+        t.classList.add("hw-small");
+        svg.appendChild(t);
+    });
+}
+function unlockHeart(){
+    const input=document.getElementById("heartPassword");
+    const error=document.getElementById("heartError");
+    const screen=document.getElementById("heartScreen");
+    const reveal=document.getElementById("heartReveal");
+    if(input.value.trim().toLowerCase()!==HEART_PASSWORD.toLowerCase()){
+        error.classList.remove("show");screen.classList.remove("shake");void error.offsetWidth;void screen.offsetWidth;
+        error.classList.add("show");screen.classList.add("shake");
+        input.value="";input.focus();
+        if(typeof wrongGiftSound==="function") wrongGiftSound();
+        return;
+    }
+    input.disabled=true;document.getElementById("unlockHeart").disabled=true;input.blur();
+    error.classList.remove("show");
+    buildHeartWordArt();
+    reveal.classList.remove("show");void reveal.offsetWidth;reveal.classList.add("show");
+    if(typeof unlockGiftSound==="function") unlockGiftSound();
+    if(typeof flyingHearts==="function") setTimeout(flyingHearts,250);
+    if(typeof confetti==="function") setTimeout(confetti,500);
+}
+
+document.getElementById("heartButton").onclick=function(){
+    buttonSound();
+    document.getElementById("birthday").classList.add("hidden");
+    document.getElementById("heartScreen").classList.remove("hidden");
+    document.getElementById("heartPassword").value="";
+    document.getElementById("heartPassword").disabled=false;
+    document.getElementById("unlockHeart").disabled=false;
+    document.getElementById("heartReveal").classList.remove("show");
+    document.getElementById("heartError").classList.remove("show");
+};
+document.getElementById("unlockHeart").onclick=unlockHeart;
+document.getElementById("heartPassword").addEventListener("keydown",e=>{if(e.key==="Enter")unlockHeart()});
+document.getElementById("backHeart").onclick=function(){
+    buttonSound();document.getElementById("heartScreen").classList.add("hidden");document.getElementById("birthday").classList.remove("hidden");
+};
+
+/* =====================================================
+   FOR YOU, HER BEST FRIEND
+===================================================== */
+document.getElementById("bestFriendButton").onclick=function(){
+    buttonSound();
+    document.getElementById("birthday").classList.add("hidden");
+    document.getElementById("bestFriendScreen").classList.remove("hidden");
+};
+document.getElementById("backBestFriend").onclick=function(){
+    buttonSound();
+    document.getElementById("bestFriendScreen").classList.add("hidden");
+    document.getElementById("birthday").classList.remove("hidden");
+};
+
 /* =====================================================  
    REASONS  
 ===================================================== */  
@@ -2681,36 +3357,25 @@ document.getElementById("backReason").onclick=function(){
 };  
   
   
-/* =====================================================  
-   FINAL SURPRISE  
-===================================================== */  
-  
-document.getElementById("finalButton").onclick=function(){  
-  
-    buttonSound();  
-  
-    document.getElementById("birthday")  
-        .classList.add("hidden");  
-  
-    document.getElementById("finalScreen")  
-        .classList.remove("hidden");  
-  
-    confetti();  
-    flyingHearts();  
-};  
-  
-document.getElementById("closeFinal").onclick=function(){  
-  
-    buttonSound();  
-  
-    document.getElementById("finalScreen")  
-        .classList.add("hidden");  
-  
-    document.getElementById("birthday")  
-        .classList.remove("hidden");  
-};  
-  
-  
+/* =====================================================
+   MILS PART — DISTANCE MAP
+===================================================== */
+
+document.getElementById("finalButton").onclick=function(){
+    buttonSound();
+    document.getElementById("birthday").classList.add("hidden");
+    const map=document.getElementById("finalScreen");
+    map.classList.remove("hidden");
+    const viewport=map.querySelector(".distanceMapViewport");
+    if(viewport) viewport.scrollTop=0;
+};
+
+document.getElementById("backMap").onclick=function(){
+    buttonSound();
+    document.getElementById("finalScreen").classList.add("hidden");
+    document.getElementById("birthday").classList.remove("hidden");
+};
+
 /* =====================================================  
    CONFETTI  
 ===================================================== */  
